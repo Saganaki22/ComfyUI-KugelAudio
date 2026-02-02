@@ -9,6 +9,6 @@ dependencies = ["torch>=2.0.0", "transformers==4.57.1", "huggingface-hub>=0.20.0
 Repository = "https://github.com/Saganaki22/ComfyUI-KugelAudio"
 
 [tool.comfy]
-PublisherId = "Saganaki22"
+PublisherId = "saganaki22"
 DisplayName = "KugelAudio"
 Icon = "https://avatars.githubusercontent.com/u/84208527"

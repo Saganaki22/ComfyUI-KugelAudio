@@ -56,7 +56,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                     "default": False,
                     "label_on": "4-bit (BNB)",
                     "label_off": "Full Precision",
-                    "tooltip": "Quantize the LLM to 4-bit using bitsandbytes. Reduces VRAM from ~19GB to ~8GB. Audio components stay at full precision. Note: May not be compatible with all attention types (SageAttention recommended).",
+                    "tooltip": "Quantize the LLM to 4-bit using bitsandbytes. Reduces VRAM from ~19GB to ~8GB. Audio components stay at full precision. Requires CUDA GPU - automatically disabled for CPU/MPS devices.",
                 }),
                 "cfg_scale": ("FLOAT", {
                     "default": 3.0,
@@ -83,6 +83,10 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 "output_stereo": ("BOOLEAN", {
                     "default": False,
                     "tooltip": "Output stereo audio (duplicates mono channel). Use if your workflow expects stereo.",
+                }),
+                "device": (["auto", "cuda", "mps", "cpu"], {
+                    "default": "auto",
+                    "tooltip": "Device to use for inference. Auto detects best available. Select 'cpu' for Apple Silicon MPS compatibility if you get errors.",
                 }),
             },
             "optional": {
@@ -131,6 +135,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
         language: str,
         keep_loaded: bool,
         output_stereo: bool,
+        device: str,
         seed: int = 42,
         max_words_per_chunk: int = 250,
         do_sample: bool = False,
@@ -173,6 +178,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 model_path=resolve_model_path(model),
                 attention_type=attention_type,
                 use_4bit=use_4bit,
+                device=device,
             )
             
             if pbar:

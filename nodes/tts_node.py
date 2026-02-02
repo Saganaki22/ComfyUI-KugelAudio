@@ -84,6 +84,12 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                     "default": False,
                     "tooltip": "Output stereo audio (duplicates mono channel). Use if your workflow expects stereo.",
                 }),
+                "force_cpu": ("BOOLEAN", {
+                    "default": False,
+                    "label_on": "Force CPU (MPS workaround)",
+                    "label_off": "Auto (GPU/MPS if available)",
+                    "tooltip": "Force CPU mode for Apple Silicon MPS compatibility. Enable if you get 'mps_matmul: error' on Mac.",
+                }),
             },
             "optional": {
                 "seed": ("INT", {
@@ -131,6 +137,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
         language: str,
         keep_loaded: bool,
         output_stereo: bool,
+        force_cpu: bool,
         seed: int = 42,
         max_words_per_chunk: int = 250,
         do_sample: bool = False,
@@ -173,6 +180,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 model_path=resolve_model_path(model),
                 attention_type=attention_type,
                 use_4bit=use_4bit,
+                force_cpu=force_cpu,
             )
             
             if pbar:

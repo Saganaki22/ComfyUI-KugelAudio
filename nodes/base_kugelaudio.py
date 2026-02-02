@@ -311,6 +311,7 @@ class BaseKugelAudioNode:
         model_path: str,
         attention_type: str = "auto",
         use_4bit: bool = False,
+        force_cpu: bool = False,
     ) -> Tuple[Any, Any]:
         """Load model with caching (VibeVoice-style).
         
@@ -342,7 +343,11 @@ class BaseKugelAudioNode:
         self.clear_shared_model()
         
         # Determine device
-        if torch.cuda.is_available():
+        if force_cpu:
+            device = "cpu"
+            dtype = torch.float32
+            logger.warning("Force CPU mode enabled (MPS workaround for Apple Silicon)")
+        elif torch.cuda.is_available():
             device = "cuda"
             dtype = torch.bfloat16
         elif torch.backends.mps.is_available():

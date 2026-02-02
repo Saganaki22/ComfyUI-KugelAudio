@@ -84,6 +84,12 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                     "default": False,
                     "tooltip": "Output stereo audio (duplicates mono channel). Use if your workflow expects stereo.",
                 }),
+                "force_cpu": ("BOOLEAN", {
+                    "default": False,
+                    "label_on": "Force CPU (MPS workaround)",
+                    "label_off": "Auto (GPU/MPS if available)",
+                    "tooltip": "Force CPU mode for Apple Silicon MPS compatibility. Enable if you get 'mps_matmul: error' on Mac.",
+                }),
             },
             "optional": {
                 "voice_prompt": ("AUDIO", {
@@ -134,6 +140,7 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
         language: str,
         keep_loaded: bool,
         output_stereo: bool,
+        force_cpu: bool,
         voice_prompt: Optional[Dict[str, Any]] = None,
         seed: int = 42,
         max_words_per_chunk: int = 250,
@@ -177,6 +184,7 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                 model_path=resolve_model_path(model),
                 attention_type=attention_type,
                 use_4bit=use_4bit,
+                force_cpu=force_cpu,
             )
             
             if pbar:

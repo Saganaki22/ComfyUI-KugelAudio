@@ -102,6 +102,7 @@ _shared_config = {
     "model_path": None,
     "attention_type": None,
     "use_4bit": None,
+    "force_cpu": None,
 }
 
 # Model path lookup cache
@@ -329,7 +330,8 @@ class BaseKugelAudioNode:
             _shared_processor is not None and
             _shared_config.get("model_path") == model_path and
             _shared_config.get("attention_type") == attention_type and
-            _shared_config.get("use_4bit") == use_4bit):
+            _shared_config.get("use_4bit") == use_4bit and
+            _shared_config.get("force_cpu") == force_cpu):
             logger.debug("Using cached model")
             return _shared_model, _shared_processor
         

@@ -294,14 +294,12 @@ If the auto-installer fails or you need to reinstall the bundled package:
 # Navigate to the custom node folder
 cd ComfyUI/custom_nodes/ComfyUI-KugelAudio
 
-# Install using portable Python (replace /path/to/ComfyUI with your actual path)
+# Install using portable Python (replace /path/to/ComfyUI with your actual path) or run .bat file
 C:\path\to\ComfyUI\python_embeded\python.exe -m pip install ./kugelaudio-open
 
 # For standard Python installation
 python -m pip install ./kugelaudio-open
 
-# To force reinstall (after updating the custom node)
-C:\path\to\ComfyUI\python_embeded\python.exe -m pip install --force-reinstall ./kugelaudio-open
 ```
 
 **Verify installation:**

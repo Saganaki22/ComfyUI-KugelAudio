@@ -1,4 +1,4 @@
-# ComfyUI-KugelAudio
+<h1 align="center">ComfyUI-KugelAudio</h1>
 
 <p align="center">
   <strong>ComfyUI nodes for KugelAudio</strong> - Open-source text-to-speech with voice cloning for 24 European languages<br>
@@ -22,6 +22,8 @@
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   </a>
 </p>
+
+<img width="2271" height="972" alt="Screenshot 2026-02-02 050108" src="https://github.com/user-attachments/assets/01c0c3c9-36c3-423c-a69f-03b783b7342b" />
 
 ## Features
 

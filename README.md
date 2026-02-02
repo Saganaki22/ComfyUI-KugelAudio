@@ -113,6 +113,27 @@ pip install bitsandbytes
 <details>
 <summary><b>Node Reference</b></summary>
 
+### Device Selection
+
+All nodes include a **Device** dropdown to control where inference runs:
+
+| Option | Description |
+|--------|-------------|
+| `auto` | Automatically detects best available (CUDA → MPS → CPU) |
+| `cuda` | Force NVIDIA GPU (recommended for best performance) |
+| `mps` | Force Apple Silicon GPU (may have compatibility issues) |
+| `cpu` | Force CPU execution (slower but most compatible) |
+
+**Apple Silicon Users:** ⚠️ MPS may cause `mps_matmul` errors during generation. If you encounter crashes, manually select `cpu` from the device dropdown.
+
+**4-bit Quantization:** Requires CUDA GPU. Automatically disabled for CPU/MPS devices.
+
+**CPU Optimization:** If using CPU mode with low utilization, set thread count:
+```python
+import torch
+torch.set_num_threads(8)  # Match your CPU cores
+```
+
 ### KugelAudio TTS
 
 Generate speech from text with full control over generation parameters.
@@ -120,8 +141,9 @@ Generate speech from text with full control over generation parameters.
 **Inputs:**
 - `text`: Text to synthesize
 - `model`: Model selection (auto-downloads on first run)
+- `device`: Device selection (auto/cuda/mps/cpu)
 - `attention_type`: Attention implementation (auto/sage_attn/flash_attn/sdpa/eager)
-- `use_4bit`: Enable 4-bit quantization (~8GB VRAM, SDPA/Eager only)
+- `use_4bit`: Enable 4-bit quantization (~8GB VRAM, requires CUDA, SDPA/Eager only)
 - `cfg_scale`: Guidance scale (1.0-10.0, default 3.0) - higher = more adherence to text
 - `max_new_tokens`: Max generation length (512-4096, default 2048)
 - `language`: Optional language hint (auto-detects if not set)
@@ -320,12 +342,29 @@ If you see warnings about attention types:
 - Auto mode will automatically select the best compatible option
 - SageAttention and FlashAttention require CUDA
 
-### CPU Mode (No GPU)
+### Device Selection & Compatibility
 
-For systems without CUDA:
-- Set attention_type to "eager"
-- 4-bit quantization still works with SDPA
-- Expect significantly slower generation
+**Apple Silicon (MPS) Issues:**
+- MPS may cause `mps_matmul` errors during generation
+- If you see "incompatible dimensions" or "LLVM ERROR", select `cpu` from the Device dropdown
+- MPS is auto-detected but not always stable with this model
+
+**CPU Mode:**
+- Select `cpu` from the Device dropdown
+- 4-bit quantization requires CUDA (automatically disabled on CPU)
+- Set PyTorch threads for better utilization:
+  ```python
+  import torch
+  torch.set_num_threads(8)  # Match your CPU cores
+  ```
+- Expect significantly slower generation than GPU
+
+**Forcing Specific Device:**
+- Use the Device dropdown in any KugelAudio node
+- `auto`: Tries CUDA → MPS → CPU (with warnings for MPS)
+- `cuda`: NVIDIA GPU only
+- `mps`: Apple Silicon GPU only (may have issues)
+- `cpu`: CPU only (most compatible)
 
 ### Long Text Not Processing
 

@@ -134,6 +134,20 @@ import torch
 torch.set_num_threads(8)  # Match your CPU cores
 ```
 
+**Precision by Device:**
+
+The model automatically uses optimal precision for each device:
+
+| Device | Precision | Notes |
+|--------|-----------|-------|
+| **CUDA** | bfloat16 | Best performance/quality balance on NVIDIA GPUs |
+| **MPS** | float16 | Required for Apple Silicon (bfloat16 not supported) |
+| **CPU** | float32 | Full precision for best compatibility |
+
+- MPS uses fp16 for speed, but may still have compatibility issues
+- CPU uses fp32 because PyTorch has limited fp16 support on CPU
+- CUDA uses bfloat16 for optimal performance without quality loss
+
 ### KugelAudio TTS
 
 Generate speech from text with full control over generation parameters.

@@ -389,7 +389,11 @@ class BaseKugelAudioNode:
         
         if attention_type == "sage":
             # SageAttention requires special handling - can't be set via attn_implementation
-            if not SAGE_ATTENTION_AVAILABLE:
+            if force_cpu:
+                logger.warning("SageAttention not compatible with CPU mode, falling back to sdpa")
+                model_kwargs["attn_implementation"] = "sdpa"
+                actual_attention = "sdpa"
+            elif not SAGE_ATTENTION_AVAILABLE:
                 logger.warning("SageAttention not installed, falling back to sdpa")
                 logger.warning("Install with: pip install sageattention")
                 model_kwargs["attn_implementation"] = "sdpa"
@@ -405,8 +409,14 @@ class BaseKugelAudioNode:
                 logger.info("Using SageAttention (GPU-optimized)")
         elif attention_type == "auto":
             # Auto mode - check availability in priority order: sage → flash → sdpa → eager
-            # But skip sage/flash if 4-bit quantization is enabled
-            if use_4bit:
+            # But skip sage/flash if 4-bit quantization is enabled or force_cpu is enabled
+            if force_cpu:
+                # CPU mode: only SDPA or Eager will work (no CUDA-dependent attention)
+                logger.info("CPU mode: Auto-selecting from sdpa/eager only")
+                model_kwargs["attn_implementation"] = "sdpa"
+                actual_attention = "sdpa"
+                logger.info("Auto-selected: SDPA (CPU compatible)")
+            elif use_4bit:
                 # 4-bit only supports sdpa/eager
                 logger.info("4-bit mode: Auto-selecting from sdpa/eager only")
                 model_kwargs["attn_implementation"] = "sdpa"
@@ -430,9 +440,15 @@ class BaseKugelAudioNode:
                     logger.info("Auto-selected: SDPA (PyTorch optimized)")
         elif attention_type != "auto":
             # For flash_attention_2, sdpa, eager - pass directly to transformers
-            model_kwargs["attn_implementation"] = attention_type
-            actual_attention = attention_type
-            logger.info(f"Using {attention_type} attention implementation")
+            # But check CPU compatibility for flash_attention_2
+            if force_cpu and attention_type == "flash_attention_2":
+                logger.warning("Flash Attention 2 not compatible with CPU mode, falling back to sdpa")
+                model_kwargs["attn_implementation"] = "sdpa"
+                actual_attention = "sdpa"
+            else:
+                model_kwargs["attn_implementation"] = attention_type
+                actual_attention = attention_type
+                logger.info(f"Using {attention_type} attention implementation")
         
         # Handle quantization - only quantize the LLM component
         # Skip: prediction_head (diffusion), speech_vae, semantic_vae for audio quality

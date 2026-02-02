@@ -354,6 +354,8 @@ class BaseKugelAudioNode:
                 device = "mps"
                 dtype = torch.float16
                 logger.info("Auto-selected: MPS device (Apple Silicon)")
+                logger.warning("⚠️  MPS may cause 'mps_matmul' errors with some models.")
+                logger.warning("   If you encounter crashes, manually select 'cpu' from the device dropdown.")
             else:
                 device = "cpu"
                 dtype = torch.float32
@@ -364,6 +366,8 @@ class BaseKugelAudioNode:
         elif device == "mps":
             dtype = torch.float16
             logger.info(f"Using device: {device} (Apple Silicon)")
+            logger.warning("⚠️  MPS may cause 'mps_matmul' errors with some models.")
+            logger.warning("   If you encounter crashes, switch to 'cpu' from the device dropdown.")
         elif device == "cpu":
             dtype = torch.float32
             logger.info(f"Using device: {device}")

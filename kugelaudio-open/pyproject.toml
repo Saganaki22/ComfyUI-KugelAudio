@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kugelaudio-open"
+version = "0.1.0"
+authors = [
+    { name = "Kajo Kratzenstein", email = "kajo@kugelaudio.com" },
+]
+maintainers = [
+    { name = "Kajo Kratzenstein", email = "kajo@kugelaudio.com" },
+]
+description = "Open-source speech synthesis with AR + diffusion architecture"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+keywords = ["tts", "speech-synthesis", "diffusion", "transformer", "audio"]
+
+dependencies = [
+    "transformers==4.57.1",
+    "accelerate>=1.0.0",
+    "diffusers>=0.25.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0",
+    "tqdm>=4.65.0",
+    "audioseal>=0.1.0",
+    "gradio>=6.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+server = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.22.0",
+    "websockets>=11.0.0",
+]
+ui = [
+    "gradio>=4.0.0",
+]
+all = [
+    "gradio>=4.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.22.0",
+]
+
+[project.urls]
+Homepage = "https://kugelaudio.com"
+Documentation = "https://docs.kugelaudio.com"
+Repository = "https://github.com/kugelaudio/kugelaudio"
+API = "https://api.kugelaudio.com"
+
+[project.scripts]
+kugelaudio = "kugelaudio_open.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kugelaudio_open = ["configs/*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]

@@ -174,10 +174,6 @@ All KugelAudio output contains an inaudible watermark using Facebook's AudioSeal
 - `detected`: String ("Detected" / "Not Detected")
 - `confidence`: Float (0.0-1.0)
 
-### KugelAudio Free Memory
-
-Manually unload the model from VRAM. Use this if you want to free memory without restarting ComfyUI.
-
 **Audio Format:**
 - **Input:** Any sample rate, mono or stereo (auto-converted)
 - **Output:** 24kHz mono (optionally stereo)
@@ -259,10 +255,6 @@ KugelAudio achieves state-of-the-art performance, beating industry leaders inclu
 **Windows:**
 ```bash
 pip install bitsandbytes
-```
-Or if pip install fails:
-```bash
-pip install --index-url https://pypi.org/simple/ bitsandbytes
 ```
 
 **Linux:**

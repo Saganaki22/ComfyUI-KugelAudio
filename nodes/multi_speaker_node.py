@@ -63,7 +63,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                     "default": False,
                     "label_on": "4-bit (BNB)",
                     "label_off": "Full Precision",
-                    "tooltip": "Quantize the LLM to 4-bit using bitsandbytes. Reduces VRAM from ~19GB to ~8GB. Audio components stay at full precision. Note: May not be compatible with all attention types (SageAttention recommended).",
+                    "tooltip": "Quantize the LLM to 4-bit using bitsandbytes. Reduces VRAM from ~19GB to ~8GB. Audio components stay at full precision. Requires CUDA GPU - automatically disabled for CPU/MPS devices.",
                 }),
                 "cfg_scale": ("FLOAT", {
                     "default": 3.0,

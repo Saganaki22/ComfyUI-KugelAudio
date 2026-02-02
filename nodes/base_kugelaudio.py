@@ -479,6 +479,17 @@ class BaseKugelAudioNode:
         # Handle quantization - only quantize the LLM component
         # Skip: prediction_head (diffusion), speech_vae, semantic_vae for audio quality
         use_quantization = False
+        
+        # Disable 4-bit for non-CUDA devices (CPU/MPS don't support bitsandbytes)
+        if use_4bit and device in ["cpu", "mps"]:
+            logger.warning("=" * 60)
+            logger.warning("4-BIT QUANTIZATION NOT AVAILABLE")
+            logger.warning("=" * 60)
+            logger.warning(f"4-bit quantization requires CUDA GPU.")
+            logger.warning(f"Current device: '{device}' - using full precision instead.")
+            logger.warning("=" * 60)
+            use_4bit = False
+        
         if use_4bit and device == "cuda":
             try:
                 from transformers import BitsAndBytesConfig

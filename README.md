@@ -51,7 +51,7 @@
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/kugelaudio/ComfyUI-KugelAudio.git
+git clone https://github.com/Saganaki22/ComfyUI-KugelAudio.git
 ```
 
 **Bundled package:** The `kugelaudio-open` folder is included and must be installed. ComfyUI will try to auto-install it on first launch. If that fails, install manually (see below).
@@ -104,9 +104,6 @@ Or double-click `install_portable.bat` in the ComfyUI-KugelAudio folder.
 ```bash
 # Standard installation
 pip install bitsandbytes
-
-# Or if pip install fails, try:
-pip install --index-url https://pypi.org/simple/ bitsandbytes
 ```
 
 **Note:** 4-bit quantization only supports SDPA and Eager attention types.

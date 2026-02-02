@@ -241,6 +241,9 @@ KugelAudio achieves state-of-the-art performance, beating industry leaders inclu
 <details>
 <summary><b>Troubleshooting</b></summary>
 
+### Voice cloning failed: 'Qwen2Config' object has no attribute 'pad_token_id'
+## run install_portable.bat in ComfyUI\custom_nodes\ComfyUI-KugelAudio
+
 ### Out of Memory (OOM) Errors
 
 1. **Enable 4-bit quantization**: Reduces VRAM from ~19GB to ~8GB

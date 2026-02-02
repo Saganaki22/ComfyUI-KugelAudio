@@ -23,7 +23,8 @@
   </a>
 </p>
 
-<img width="2271" height="972" alt="Screenshot 2026-02-02 050108" src="https://github.com/user-attachments/assets/01c0c3c9-36c3-423c-a69f-03b783b7342b" />
+<img width="2277" height="953" alt="Screenshot 2026-02-02 202247" src="https://github.com/user-attachments/assets/72cf7a16-acc7-4cd3-a615-ea8a7195d48e" />
+
 
 ## Features
 

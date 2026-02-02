@@ -102,7 +102,7 @@ _shared_config = {
     "model_path": None,
     "attention_type": None,
     "use_4bit": None,
-    "force_cpu": None,
+    "device": None,
 }
 
 # Model path lookup cache
@@ -312,7 +312,7 @@ class BaseKugelAudioNode:
         model_path: str,
         attention_type: str = "auto",
         use_4bit: bool = False,
-        force_cpu: bool = False,
+        device: str = "auto",
     ) -> Tuple[Any, Any]:
         """Load model with caching (VibeVoice-style).
         
@@ -331,7 +331,7 @@ class BaseKugelAudioNode:
             _shared_config.get("model_path") == model_path and
             _shared_config.get("attention_type") == attention_type and
             _shared_config.get("use_4bit") == use_4bit and
-            _shared_config.get("force_cpu") == force_cpu):
+            _shared_config.get("device") == device):
             logger.debug("Using cached model")
             return _shared_model, _shared_processor
         
@@ -345,19 +345,39 @@ class BaseKugelAudioNode:
         self.clear_shared_model()
         
         # Determine device
-        if force_cpu:
-            device = "cpu"
-            dtype = torch.float32
-            logger.warning("Force CPU mode enabled (MPS workaround for Apple Silicon)")
-        elif torch.cuda.is_available():
-            device = "cuda"
+        if device == "auto":
+            if torch.cuda.is_available():
+                device = "cuda"
+                dtype = torch.bfloat16
+                logger.info("Auto-selected: CUDA device")
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                device = "mps"
+                dtype = torch.float16
+                logger.info("Auto-selected: MPS device (Apple Silicon)")
+            else:
+                device = "cpu"
+                dtype = torch.float32
+                logger.info("Auto-selected: CPU device")
+        elif device == "cuda":
             dtype = torch.bfloat16
-        elif torch.backends.mps.is_available():
-            device = "mps"
+            logger.info(f"Using device: {device}")
+        elif device == "mps":
             dtype = torch.float16
-        else:
-            device = "cpu"
+            logger.info(f"Using device: {device} (Apple Silicon)")
+        elif device == "cpu":
             dtype = torch.float32
+            logger.info(f"Using device: {device}")
+        else:
+            logger.warning(f"Unknown device '{device}', falling back to auto-detection")
+            if torch.cuda.is_available():
+                device = "cuda"
+                dtype = torch.bfloat16
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                device = "mps"
+                dtype = torch.float16
+            else:
+                device = "cpu"
+                dtype = torch.float32
         
         # Prepare model kwargs
         # Use 'dtype' instead of deprecated 'torch_dtype' (transformers >= 4.56)
@@ -391,8 +411,8 @@ class BaseKugelAudioNode:
         
         if attention_type == "sage":
             # SageAttention requires special handling - can't be set via attn_implementation
-            if force_cpu:
-                logger.warning("SageAttention not compatible with CPU mode, falling back to sdpa")
+            if device in ["cpu", "mps"]:
+                logger.warning(f"SageAttention requires CUDA, not compatible with {device.upper()}, falling back to sdpa")
                 model_kwargs["attn_implementation"] = "sdpa"
                 actual_attention = "sdpa"
             elif not SAGE_ATTENTION_AVAILABLE:
@@ -411,13 +431,13 @@ class BaseKugelAudioNode:
                 logger.info("Using SageAttention (GPU-optimized)")
         elif attention_type == "auto":
             # Auto mode - check availability in priority order: sage → flash → sdpa → eager
-            # But skip sage/flash if 4-bit quantization is enabled or force_cpu is enabled
-            if force_cpu:
-                # CPU mode: only SDPA or Eager will work (no CUDA-dependent attention)
-                logger.info("CPU mode: Auto-selecting from sdpa/eager only")
+            # But skip sage/flash if: device is CPU/MPS, 4-bit quantization is enabled, or CUDA is unavailable
+            if device in ["cpu", "mps"]:
+                # CPU/MPS mode: only SDPA or Eager will work (no CUDA-dependent attention)
+                logger.info(f"{device.upper()} mode: Auto-selecting from sdpa/eager only (CUDA attention not supported)")
                 model_kwargs["attn_implementation"] = "sdpa"
                 actual_attention = "sdpa"
-                logger.info("Auto-selected: SDPA (CPU compatible)")
+                logger.info("Auto-selected: SDPA (CPU/MPS compatible)")
             elif use_4bit:
                 # 4-bit only supports sdpa/eager
                 logger.info("4-bit mode: Auto-selecting from sdpa/eager only")
@@ -443,8 +463,8 @@ class BaseKugelAudioNode:
         elif attention_type != "auto":
             # For flash_attention_2, sdpa, eager - pass directly to transformers
             # But check CPU compatibility for flash_attention_2
-            if force_cpu and attention_type == "flash_attention_2":
-                logger.warning("Flash Attention 2 not compatible with CPU mode, falling back to sdpa")
+            if device in ["cpu", "mps"] and attention_type == "flash_attention_2":
+                logger.warning(f"Flash Attention 2 requires CUDA, not compatible with {device.upper()}, falling back to sdpa")
                 model_kwargs["attn_implementation"] = "sdpa"
                 actual_attention = "sdpa"
             else:

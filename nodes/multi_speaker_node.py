@@ -91,11 +91,9 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                     "default": False,
                     "tooltip": "Output stereo audio (duplicates mono channel). Use if your workflow expects stereo.",
                 }),
-                "force_cpu": ("BOOLEAN", {
-                    "default": False,
-                    "label_on": "Force CPU (MPS workaround)",
-                    "label_off": "Auto (GPU/MPS if available)",
-                    "tooltip": "Force CPU mode for Apple Silicon MPS compatibility. Enable if you get 'mps_matmul: error' on Mac.",
+                "device": (["auto", "cuda", "mps", "cpu"], {
+                    "default": "auto",
+                    "tooltip": "Device to use for inference. Auto detects best available. Select 'cpu' for Apple Silicon MPS compatibility if you get errors.",
                 }),
             },
             "optional": {
@@ -162,7 +160,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
         language: str,
         keep_loaded: bool,
         output_stereo: bool,
-        force_cpu: bool,
+        device: str,
         speaker1_voice: Optional[Dict[str, Any]] = None,
         speaker2_voice: Optional[Dict[str, Any]] = None,
         speaker3_voice: Optional[Dict[str, Any]] = None,
@@ -243,7 +241,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                 model_path=model_path,
                 attention_type=attention_type,
                 use_4bit=use_4bit,
-                force_cpu=force_cpu,
+                device=device,
             )
             
             if pbar:

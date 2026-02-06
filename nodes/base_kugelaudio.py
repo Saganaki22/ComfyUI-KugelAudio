@@ -615,6 +615,11 @@ class BaseKugelAudioNode:
         elif audio.dim() == 2:
             audio = audio.unsqueeze(0)
         
+        # Add trailing silence to prevent cutoff (200ms of padding)
+        padding_samples = int(0.2 * sample_rate)
+        silence = torch.zeros(audio.shape[0], audio.shape[1], padding_samples, device=audio.device, dtype=audio.dtype)
+        audio = torch.cat([audio, silence], dim=-1)
+        
         # Convert to float32
         audio = audio.cpu().float()
         

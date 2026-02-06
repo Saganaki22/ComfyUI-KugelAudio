@@ -847,7 +847,7 @@ class TokenizerDecoder(nn.Module):
         bias = getattr(config, "bias", True)
         layernorm = getattr(config, "layernorm", "LN")
         layernorm_eps = getattr(config, "layernorm_eps", 1e-6)
-        trim_right_ratio = getattr(config, "trim_right_ratio", 1.0)
+        trim_right_ratio = getattr(config, "trim_right_ratio", 0.8)
         layernorm_elementwise_affine = getattr(config, "layernorm_elementwise_affine", True)
         drop_path_rate = getattr(config, "drop_path_rate", 0.0)
         mixer_layer = getattr(config, "mixer_layer", "conv")

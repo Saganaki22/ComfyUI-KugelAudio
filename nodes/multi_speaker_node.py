@@ -317,8 +317,17 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                 # Check for interruption after generation
                 self._check_interrupt()
                 
-                # Extract audio
-                audio_segments.append(outputs.speech_outputs[0])
+                # Extract audio and add padding to prevent cutoff
+                segment_audio = outputs.speech_outputs[0]
+                # Add 100ms padding at end of each segment
+                sample_rate = 24000
+                segment_padding = int(0.1 * sample_rate)
+                if segment_audio.dim() == 1:
+                    segment_silence = torch.zeros(segment_padding, dtype=segment_audio.dtype, device=segment_audio.device)
+                else:
+                    segment_silence = torch.zeros(segment_audio.shape[0], segment_padding, dtype=segment_audio.dtype, device=segment_audio.device)
+                segment_audio = torch.cat([segment_audio, segment_silence], dim=-1)
+                audio_segments.append(segment_audio)
                 logger.info(f"  Line {i+1} generated successfully")
             
             # Concatenate all audio segments with pause between speakers

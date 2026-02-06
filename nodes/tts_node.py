@@ -232,8 +232,17 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 # Log completion
                 logger.info(f"Audio generated successfully")
                 
-                # Extract audio
-                audio_tensors.append(outputs.speech_outputs[0])
+                # Extract audio and add padding to prevent cutoff
+                chunk_audio = outputs.speech_outputs[0]
+                # Add 100ms padding at end of each chunk
+                sample_rate = 24000
+                chunk_padding = int(0.1 * sample_rate)
+                if chunk_audio.dim() == 1:
+                    chunk_silence = torch.zeros(chunk_padding, dtype=chunk_audio.dtype, device=chunk_audio.device)
+                else:
+                    chunk_silence = torch.zeros(chunk_audio.shape[0], chunk_padding, dtype=chunk_audio.dtype, device=chunk_audio.device)
+                chunk_audio = torch.cat([chunk_audio, chunk_silence], dim=-1)
+                audio_tensors.append(chunk_audio)
             
             # Finalize progress
             if pbar:

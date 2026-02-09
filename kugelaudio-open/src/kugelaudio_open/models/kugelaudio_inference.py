@@ -370,6 +370,7 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
         do_sample: bool = False,
         temperature: float = 1.0,
         show_progress: bool = True,
+        apply_watermark: bool = True,
         **kwargs,
     ) -> KugelAudioGenerationOutput:
         """Generate speech from text.
@@ -387,6 +388,7 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
             do_sample: Whether to sample or use greedy decoding
             temperature: Sampling temperature
             show_progress: Whether to show progress bar
+            apply_watermark: Whether to apply watermark (disable for chunking to avoid boundary artifacts)
 
         Returns:
             KugelAudioGenerationOutput with sequences and speech_outputs
@@ -741,8 +743,9 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
                 max_val = concatenated.abs().max()
                 if max_val > 1.0:
                     concatenated = concatenated * (0.95 / max_val)
-                # Apply watermark to all generated audio
-                concatenated = self._apply_watermark(concatenated, sample_rate=24000)
+                # Apply watermark to all generated audio (if enabled)
+                if apply_watermark:
+                    concatenated = self._apply_watermark(concatenated, sample_rate=24000)
                 speech_outputs.append(concatenated)
             else:
                 speech_outputs.append(None)
@@ -778,9 +781,15 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
 
         audio_for_wm = audio_for_wm.float()
 
-        # Resample to 16kHz for AudioSeal
+        # Resample to 16kHz for AudioSeal using high-quality resampling
         if sample_rate != 16000:
-            audio_16k = F.resample(audio_for_wm, sample_rate, 16000)
+            # Use high-quality resampling to minimize artifacts
+            audio_16k = F.resample(
+                audio_for_wm,
+                sample_rate,
+                16000,
+                resampling_method="sinc_interp_hann"
+            )
         else:
             audio_16k = audio_for_wm
 
@@ -793,9 +802,14 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
         with torch.no_grad():
             watermark_16k = self._wm_generator.get_watermark(audio_16k.to(device), 16000)
 
-        # Resample watermark back to original sample rate
+        # Resample watermark back to original sample rate using high-quality resampling
         if sample_rate != 16000:
-            watermark = F.resample(watermark_16k, 16000, sample_rate)
+            watermark = F.resample(
+                watermark_16k,
+                16000,
+                sample_rate,
+                resampling_method="sinc_interp_hann"
+            )
             # Ensure same length
             if watermark.shape[-1] != audio_for_wm.shape[-1]:
                 if watermark.shape[-1] > audio_for_wm.shape[-1]:

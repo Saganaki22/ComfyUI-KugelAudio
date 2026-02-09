@@ -614,19 +614,25 @@ class BaseKugelAudioNode:
             audio = audio.unsqueeze(0).unsqueeze(0)
         elif audio.dim() == 2:
             audio = audio.unsqueeze(0)
-        
-        # Add trailing silence to prevent cutoff (200ms of padding)
-        padding_samples = int(0.2 * sample_rate)
-        silence = torch.zeros(audio.shape[0], audio.shape[1], padding_samples, device=audio.device, dtype=audio.dtype)
-        audio = torch.cat([audio, silence], dim=-1)
-        
-        # Convert to float32
+
+        # Track original device for synchronization
+        original_device = audio.device
+
+        # Ensure audio is contiguous in memory for smooth playback
+        audio = audio.contiguous()
+
+        # Move to CPU and convert to float32
         audio = audio.cpu().float()
-        
+
+        # Synchronize device to ensure audio is fully copied to CPU
+        # This prevents stuttering caused by incomplete GPU->CPU transfers
+        if original_device.type == "cuda":
+            torch.cuda.synchronize()
+
         # Convert to stereo if requested
         if output_stereo and audio.shape[1] == 1:
             audio = audio.repeat(1, 2, 1)
-        
+
         return {
             "waveform": audio,
             "sample_rate": sample_rate,

@@ -189,9 +189,10 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
             
             # Generate audio for each chunk
             audio_tensors = []
+            num_chunks = len(chunks)
             for i, chunk in enumerate(chunks):
-                if len(chunks) > 1:
-                    logger.info(f"Processing chunk {i+1}/{len(chunks)}...")
+                if num_chunks > 1:
+                    logger.info(f"Processing chunk {i+1}/{num_chunks}...")
                 
                 # Check for interruption
                 self._check_interrupt()
@@ -212,6 +213,8 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 logger.info(f"Generating audio (~{estimated_tokens} estimated tokens, max {max_new_tokens} allowed)...")
                 
                 # Generate (KugelAudio uses internal tqdm, we use stage-based progress)
+                # Disable watermark for individual chunks to avoid boundary artifacts
+                # Watermark will be applied once after concatenation
                 with torch.no_grad():
                     outputs = model_obj.generate(
                         **inputs,
@@ -220,6 +223,7 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                         do_sample=do_sample,
                         temperature=temperature if do_sample else 1.0,
                         show_progress=True,  # Enable tqdm for CLI progress
+                        apply_watermark=(num_chunks == 1),  # Only watermark if single chunk
                     )
                 
                 # Update progress bar after each chunk
@@ -232,16 +236,8 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
                 # Log completion
                 logger.info(f"Audio generated successfully")
                 
-                # Extract audio and add padding to prevent cutoff
+                # Extract audio - watermark applied only if single chunk
                 chunk_audio = outputs.speech_outputs[0]
-                # Add 100ms padding at end of each chunk
-                sample_rate = 24000
-                chunk_padding = int(0.1 * sample_rate)
-                if chunk_audio.dim() == 1:
-                    chunk_silence = torch.zeros(chunk_padding, dtype=chunk_audio.dtype, device=chunk_audio.device)
-                else:
-                    chunk_silence = torch.zeros(chunk_audio.shape[0], chunk_padding, dtype=chunk_audio.dtype, device=chunk_audio.device)
-                chunk_audio = torch.cat([chunk_audio, chunk_silence], dim=-1)
                 audio_tensors.append(chunk_audio)
             
             # Finalize progress
@@ -251,6 +247,9 @@ class KugelAudioTTSNode(BaseKugelAudioNode):
             # Concatenate all chunks
             if len(audio_tensors) > 1:
                 full_audio = torch.cat(audio_tensors, dim=-1)
+                # Apply watermark once to full audio to avoid chunk boundary artifacts
+                logger.info("Applying watermark to full audio...")
+                full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
             else:
                 full_audio = audio_tensors[0]
             

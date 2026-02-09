@@ -1,9 +1,9 @@
 [project]
 name = "ComfyUI-KugelAudio"
-version = "0.8.3"
+version = "0.8.4"
 description = "ComfyUI nodes for KugelAudio - Open-source text-to-speech with voice cloning for 24 European languages"
 license = {file = "LICENSE"}
-dependencies = ["torch>=2.0.0", "transformers==4.57.1", "huggingface-hub>=0.20.0", "accelerate>=1.0.0", "diffusers>=0.25.0", "numpy", "scipy", "librosa>=0.10.0", "soundfile", "tqdm", "audioseal>=0.1.0", "bitsandbytes"]
+dependencies = ["torch", "transformers", "huggingface-hub", "accelerate", "diffusers", "numpy", "scipy", "librosa", "soundfile", "tqdm", "audioseal", "bitsandbytes"]
 
 [project.urls]
 Repository = "https://github.com/Saganaki22/ComfyUI-KugelAudio"

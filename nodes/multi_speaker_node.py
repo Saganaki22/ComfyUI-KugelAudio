@@ -300,6 +300,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                 logger.info(f"  Generating (~{estimated_tokens} estimated tokens)...")
                 
                 # Generate
+                # Disable watermark for individual segments to avoid boundary artifacts
                 with torch.no_grad():
                     outputs = model_obj.generate(
                         **inputs,
@@ -308,6 +309,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                         do_sample=do_sample,
                         temperature=temperature if do_sample else 1.0,
                         show_progress=True,
+                        apply_watermark=False,  # Will apply once after concatenation
                     )
                 
                 # Update progress after each line
@@ -317,16 +319,8 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                 # Check for interruption after generation
                 self._check_interrupt()
                 
-                # Extract audio and add padding to prevent cutoff
+                # Extract audio - watermark already applied by model
                 segment_audio = outputs.speech_outputs[0]
-                # Add 100ms padding at end of each segment
-                sample_rate = 24000
-                segment_padding = int(0.1 * sample_rate)
-                if segment_audio.dim() == 1:
-                    segment_silence = torch.zeros(segment_padding, dtype=segment_audio.dtype, device=segment_audio.device)
-                else:
-                    segment_silence = torch.zeros(segment_audio.shape[0], segment_padding, dtype=segment_audio.dtype, device=segment_audio.device)
-                segment_audio = torch.cat([segment_audio, segment_silence], dim=-1)
                 audio_segments.append(segment_audio)
                 logger.info(f"  Line {i+1} generated successfully")
             
@@ -355,6 +349,10 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                     logger.info(f"Concatenated {len(audio_segments)} audio segments")
                 else:
                     full_audio = audio_segments[0]
+            
+            # Apply watermark once to full audio to avoid segment boundary artifacts
+            logger.info("Applying watermark to full audio...")
+            full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
             
             # Format for ComfyUI
             audio_dict = self._format_audio_for_comfyui(

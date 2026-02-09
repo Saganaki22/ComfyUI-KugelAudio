@@ -200,13 +200,14 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
             
             # Generate audio for each chunk
             audio_tensors = []
+            num_chunks = len(chunks)
             for i, chunk in enumerate(chunks):
-                if len(chunks) > 1:
-                    logger.info(f"Processing chunk {i+1}/{len(chunks)}...")
-                
+                if num_chunks > 1:
+                    logger.info(f"Processing chunk {i+1}/{num_chunks}...")
+
                 # Check for interruption
                 self._check_interrupt()
-                
+
                 # Prepare inputs
                 if voice_audio is not None:
                     inputs = processor(
@@ -216,21 +217,22 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                     )
                 else:
                     inputs = processor(text=chunk, return_tensors="pt")
-                
+
                 inputs = {
                     k: v.to(device) if isinstance(v, torch.Tensor) else v
                     for k, v in inputs.items()
                 }
-                
+
                 # Check for interruption before generation
                 self._check_interrupt()
-                
+
                 # Estimate tokens for user information
                 text_word_count = len(chunk.split())
                 estimated_tokens = int(text_word_count * 2.5)
                 logger.info(f"Generating audio (~{estimated_tokens} estimated tokens, max {max_new_tokens} allowed)...")
-                
+
                 # Generate (KugelAudio uses internal tqdm, we use stage-based progress)
+                # Disable watermark for individual chunks to avoid boundary artifacts
                 with torch.no_grad():
                     outputs = model_obj.generate(
                         **inputs,
@@ -239,28 +241,33 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                         do_sample=do_sample,
                         temperature=temperature if do_sample else 1.0,
                         show_progress=True,  # Enable tqdm for CLI progress
+                        apply_watermark=(num_chunks == 1),  # Only watermark if single chunk
                     )
-                
+
                 # Update progress bar after each chunk
                 if pbar:
                     pbar.update_absolute(1 + i + 1, total_stages, None)
-                
+
                 # Check for interruption after generation
                 self._check_interrupt()
-                
+
                 # Log completion
                 logger.info(f"Audio generated successfully")
-                
-                # Extract audio
-                audio_tensors.append(outputs.speech_outputs[0])
-            
+
+                # Extract audio - watermark applied only if single chunk
+                chunk_audio = outputs.speech_outputs[0]
+                audio_tensors.append(chunk_audio)
+
             # Finalize progress
             if pbar:
                 pbar.update_absolute(total_stages, total_stages, None)
-            
+
             # Concatenate all chunks
             if len(audio_tensors) > 1:
                 full_audio = torch.cat(audio_tensors, dim=-1)
+                # Apply watermark once to full audio to avoid chunk boundary artifacts
+                logger.info("Applying watermark to full audio...")
+                full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
             else:
                 full_audio = audio_tensors[0]
             

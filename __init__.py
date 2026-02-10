@@ -3,8 +3,8 @@
 This package provides ComfyUI integration for KugelAudio TTS model.
 """
 
-__version__ = "1.0.0"
-__author__ = "KugelAudio"
+__version__ = "0.8.5"
+__author__ = "Saganaki22"
 
 import logging
 import os

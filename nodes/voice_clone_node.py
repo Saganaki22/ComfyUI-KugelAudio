@@ -118,6 +118,10 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                     "step": 0.1,
                     "tooltip": "Sampling temperature (only used if do_sample=True). KugelAudio does not support top_p/top_k.",
                 }),
+                "disable_watermark": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Disable audio watermarking. Enable this if you experience stuttering/micro-freezes in the generated audio.",
+                }),
             },
         }
     
@@ -144,6 +148,7 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
         max_words_per_chunk: int = 250,
         do_sample: bool = False,
         temperature: float = 1.0,
+        disable_watermark: bool = False,
     ) -> Tuple[Dict[str, Any]]:
         """Clone voice using reference audio."""
         try:
@@ -232,7 +237,7 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                 logger.info(f"Generating audio (~{estimated_tokens} estimated tokens, max {max_new_tokens} allowed)...")
 
                 # Generate (KugelAudio uses internal tqdm, we use stage-based progress)
-                # Disable watermark for individual chunks to avoid boundary artifacts
+                # Disable watermark for individual chunks to avoid boundary artifacts (unless disabled by user)
                 with torch.no_grad():
                     outputs = model_obj.generate(
                         **inputs,
@@ -241,7 +246,7 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
                         do_sample=do_sample,
                         temperature=temperature if do_sample else 1.0,
                         show_progress=True,  # Enable tqdm for CLI progress
-                        apply_watermark=(num_chunks == 1),  # Only watermark if single chunk
+                        apply_watermark=(num_chunks == 1 and not disable_watermark),  # Only watermark if single chunk and not disabled
                     )
 
                 # Update progress bar after each chunk
@@ -265,9 +270,12 @@ class KugelAudioVoiceCloneNode(BaseKugelAudioNode):
             # Concatenate all chunks
             if len(audio_tensors) > 1:
                 full_audio = torch.cat(audio_tensors, dim=-1)
-                # Apply watermark once to full audio to avoid chunk boundary artifacts
-                logger.info("Applying watermark to full audio...")
-                full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
+                # Apply watermark once to full audio to avoid chunk boundary artifacts (unless disabled)
+                if not disable_watermark:
+                    logger.info("Applying watermark to full audio...")
+                    full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
+                else:
+                    logger.info("Watermarking disabled by user")
             else:
                 full_audio = audio_tensors[0]
             

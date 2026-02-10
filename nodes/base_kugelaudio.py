@@ -325,14 +325,23 @@ class BaseKugelAudioNode:
         
         global _shared_model, _shared_processor, _shared_config
         
+        # Resolve device before cache check ("auto" needs to be converted to actual device)
+        resolved_device = device
+        if device == "auto":
+            if torch.cuda.is_available():
+                resolved_device = "cuda"
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                resolved_device = "mps"
+            else:
+                resolved_device = "cpu"
+        
         # Check if we can use cached model
         if (_shared_model is not None and
             _shared_processor is not None and
             _shared_config.get("model_path") == model_path and
             _shared_config.get("attention_type") == attention_type and
             _shared_config.get("use_4bit") == use_4bit and
-            _shared_config.get("device") == device):
-            logger.debug("Using cached model")
+            _shared_config.get("device") == resolved_device):
             return _shared_model, _shared_processor
         
         # Auto-download if needed
@@ -344,23 +353,9 @@ class BaseKugelAudioNode:
         # Clear existing model
         self.clear_shared_model()
         
-        # Determine device
-        if device == "auto":
-            if torch.cuda.is_available():
-                device = "cuda"
-                dtype = torch.bfloat16
-                logger.info("Auto-selected: CUDA device")
-            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-                device = "mps"
-                dtype = torch.float16
-                logger.info("Auto-selected: MPS device (Apple Silicon)")
-                logger.warning("⚠️  MPS may cause 'mps_matmul' errors with some models.")
-                logger.warning("   If you encounter crashes, manually select 'cpu' from the device dropdown.")
-            else:
-                device = "cpu"
-                dtype = torch.float32
-                logger.info("Auto-selected: CPU device")
-        elif device == "cuda":
+        # Use resolved device and set dtype accordingly
+        device = resolved_device
+        if device == "cuda":
             dtype = torch.bfloat16
             logger.info(f"Using device: {device}")
         elif device == "mps":
@@ -368,20 +363,9 @@ class BaseKugelAudioNode:
             logger.info(f"Using device: {device} (Apple Silicon)")
             logger.warning("⚠️  MPS may cause 'mps_matmul' errors with some models.")
             logger.warning("   If you encounter crashes, switch to 'cpu' from the device dropdown.")
-        elif device == "cpu":
+        else:  # cpu
             dtype = torch.float32
             logger.info(f"Using device: {device}")
-        else:
-            logger.warning(f"Unknown device '{device}', falling back to auto-detection")
-            if torch.cuda.is_available():
-                device = "cuda"
-                dtype = torch.bfloat16
-            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-                device = "mps"
-                dtype = torch.float16
-            else:
-                device = "cpu"
-                dtype = torch.float32
         
         # Prepare model kwargs
         # Use 'dtype' instead of deprecated 'torch_dtype' (transformers >= 4.56)
@@ -535,11 +519,12 @@ class BaseKugelAudioNode:
         elapsed = time.time() - start_time
         logger.info(f"Model loaded in {elapsed:.1f}s")
         
-        # Cache the model
+        # Cache the model (use resolved device, not "auto")
         config = {
             "model_path": model_path,
             "attention_type": attention_type,
             "use_4bit": use_4bit,
+            "device": resolved_device,
         }
         self.set_shared_model(model, processor, config)
         

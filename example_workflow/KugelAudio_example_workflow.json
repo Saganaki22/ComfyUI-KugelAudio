@@ -1,79 +1,9 @@
 {
   "id": "d87a76d1-4c9f-4ebc-ae97-79ea8cccdcd5",
   "revision": 0,
-  "last_node_id": 33,
-  "last_link_id": 44,
+  "last_node_id": 37,
+  "last_link_id": 51,
   "nodes": [
-    {
-      "id": 14,
-      "type": "LoadAudio",
-      "pos": [
-        1833.131755924805,
-        171.18352384260507
-      ],
-      "size": [
-        282.798828125,
-        136
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "AUDIO",
-          "type": "AUDIO",
-          "links": [
-            41
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.11.1",
-        "Node name for S&R": "LoadAudio"
-      },
-      "widgets_values": [
-        "sample-1.mp3",
-        null,
-        null
-      ]
-    },
-    {
-      "id": 15,
-      "type": "LoadAudio",
-      "pos": [
-        1832.9710832256221,
-        361.879311528768
-      ],
-      "size": [
-        282.798828125,
-        136
-      ],
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "AUDIO",
-          "type": "AUDIO",
-          "links": [
-            42
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.11.1",
-        "Node name for S&R": "LoadAudio"
-      },
-      "widgets_values": [
-        "sample-2.mp3",
-        null,
-        null
-      ]
-    },
     {
       "id": 4,
       "type": "LoadAudio",
@@ -86,7 +16,7 @@
         143.87979515834502
       ],
       "flags": {},
-      "order": 2,
+      "order": 0,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -94,7 +24,7 @@
           "name": "AUDIO",
           "type": "AUDIO",
           "links": [
-            39
+            45
           ]
         }
       ],
@@ -110,35 +40,6 @@
       ]
     },
     {
-      "id": 26,
-      "type": "PreviewAudio",
-      "pos": [
-        1381.9951977500607,
-        873.2655641351423
-      ],
-      "size": [
-        412.82118391719405,
-        88
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 40
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.11.1",
-        "Node name for S&R": "PreviewAudio"
-      },
-      "widgets_values": []
-    },
-    {
       "id": 29,
       "type": "LoadAudio",
       "pos": [
@@ -150,7 +51,7 @@
         136
       ],
       "flags": {},
-      "order": 3,
+      "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -187,7 +88,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -213,30 +114,6 @@
       "widgets_values": []
     },
     {
-      "id": 28,
-      "type": "MarkdownNote",
-      "pos": [
-        1836.6563112515746,
-        547.2488257251624
-      ],
-      "size": [
-        280.29481993261606,
-        277.19452365170446
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "‎",
-      "properties": {},
-      "widgets_values": [
-        "## 1-6 Speakers ➡️ <br>\n## If you connect load audio node to speakers 1-6 it will clone the input voice. <br>\n## If you don't connect an input audio it will generate random voice similar to TTS Node for that speaker.\n<br>\n\n"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
       "id": 23,
       "type": "ShowText|pysssss",
       "pos": [
@@ -248,7 +125,7 @@
         88
       ],
       "flags": {},
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -275,31 +152,339 @@
       ]
     },
     {
-      "id": 32,
-      "type": "KugelAudioMultiSpeakerNode",
+      "id": 30,
+      "type": "MarkdownNote",
       "pos": [
-        2139.9393792686424,
-        171.52515366535764
+        919.6982607386791,
+        127.12547163284302
       ],
       "size": [
-        457.20723283252846,
-        634.8390636236834
+        421.86371201698296,
+        847.7536354531678
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "‎",
+      "properties": {},
+      "widgets_values": [
+        "# KugelAudio Model Setup\n\n## Model Information\n\n**Model:** [kugelaudio-0-open on Hugging Face](https://huggingface.co/kugelaudio/kugelaudio-0-open)\n\n**Repository:** [ComfyUI-KugelAudio on GitHub](https://github.com/Saganaki22/ComfyUI-KugelAudio)\n\n## Installation Path\n\nThe model files go in:\n```\nComfyUI/\n└── models/\n    └── kugelaudio/\n        └── kugelaudio-0-open/\n            ├── config.json\n            ├── generation_config.json\n            ├── model-00001-of-00004.safetensors\n            ├── model-00002-of-00004.safetensors\n            ├── model-00003-of-00004.safetensors\n            ├── model-00004-of-00004.safetensors\n            └── model.safetensors.index.json\n```\n\n## System Requirements\n\n**VRAM Requirements:**\n- **4-bit quantization:** 8GB VRAM\n- **Full precision:** 19GB VRAM\n\n## Bug Reports\n\n[Report bugs here](https://github.com/Saganaki22/ComfyUI-KugelAudio/issues)\n\n## Supported Languages\n\nKugelAudio supports 24 major European languages with varying levels of quality based on dataset representation:\n\n| Language | Code | Flag | Language | Code | Flag | Language | Code | Flag |\n|----------|------|------|----------|------|------|----------|------|------|\n| English | en | 🇺🇸 | German | de | 🇩🇪 | French | fr | 🇫🇷 |\n| Spanish | es | 🇪🇸 | Italian | it | 🇮🇹 | Portuguese | pt | 🇵🇹 |\n| Dutch | nl | 🇳🇱 | Polish | pl | 🇵🇱 | Russian | ru | 🇷🇺 |\n| Ukrainian | uk | 🇺🇦 | Czech | cs | 🇨🇿 | Romanian | ro | 🇷🇴 |\n| Hungarian | hu | 🇭🇺 | Swedish | sv | 🇸🇪 | Danish | da | 🇩🇰 |\n| Finnish | fi | 🇫🇮 | Norwegian | no | 🇳🇴 | Greek | el | 🇬🇷 |\n| Bulgarian | bg | 🇧🇬 | Slovak | sk | 🇸🇰 | Croatian | hr | 🇭🇷 |\n| Serbian | sr | 🇷🇸 | Turkish | tr | 🇹🇷 | | | |"
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 14,
+      "type": "LoadAudio",
+      "pos": [
+        1833.131755924805,
+        171.18352384260507
+      ],
+      "size": [
+        282.798828125,
+        136
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            47
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.1",
+        "Node name for S&R": "LoadAudio"
+      },
+      "widgets_values": [
+        "sample-1.mp3",
+        null,
+        null
+      ]
+    },
+    {
+      "id": 15,
+      "type": "LoadAudio",
+      "pos": [
+        1832.9710832256221,
+        361.879311528768
+      ],
+      "size": [
+        282.798828125,
+        136
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            48
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.1",
+        "Node name for S&R": "LoadAudio"
+      },
+      "widgets_values": [
+        "sample-2.mp3",
+        null,
+        null
+      ]
+    },
+    {
+      "id": 28,
+      "type": "MarkdownNote",
+      "pos": [
+        1836.6563112515746,
+        547.2488257251624
+      ],
+      "size": [
+        280.29481993261606,
+        277.19452365170446
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "‎",
+      "properties": {},
+      "widgets_values": [
+        "## 1-6 Speakers ➡️ <br>\n## If you connect load audio node to speakers 1-6 it will clone the input voice. <br>\n## If you don't connect an input audio it will generate random voice similar to TTS Node for that speaker.\n<br>\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 2,
+      "type": "PreviewAudio",
+      "pos": [
+        2653.7795633577507,
+        627.4535649635707
+      ],
+      "size": [
+        426.5891716558865,
+        93.84615228842233
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 51
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.1",
+        "Node name for S&R": "PreviewAudio"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 26,
+      "type": "PreviewAudio",
+      "pos": [
+        1381.9951977500607,
+        873.2655641351423
+      ],
+      "size": [
+        412.82118391719405,
+        88
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 46
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.1",
+        "Node name for S&R": "PreviewAudio"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 16,
+      "type": "PreviewAudio",
+      "pos": [
+        2140.9698079065865,
+        862.0215459563409
+      ],
+      "size": [
+        462.56640419716405,
+        88
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 49
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.1",
+        "Node name for S&R": "PreviewAudio"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 37,
+      "type": "KugelAudioTTSNode",
+      "pos": [
+        2661.9167687179406,
+        144.82618242151617
+      ],
+      "size": [
+        400,
+        448
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-KugelAudio",
+        "ver": "7c73e7a159c7832bf35dae402dee50cb00323bf9",
+        "Node name for S&R": "KugelAudioTTSNode"
+      },
+      "widgets_values": [
+        "Hello! This is KugelAudio text-to-speech.",
+        "kugelaudio-0-open",
+        "auto",
+        false,
+        3,
+        2048,
+        "auto",
+        true,
+        false,
+        "auto",
+        694557083,
+        "randomize",
+        250,
+        true,
+        1,
+        false
+      ]
+    },
+    {
+      "id": 34,
+      "type": "KugelAudioVoiceCloneNode",
+      "pos": [
+        1385.63012285449,
+        363.9475338476663
+      ],
+      "size": [
+        400,
+        448
       ],
       "flags": {},
       "order": 7,
       "mode": 0,
       "inputs": [
         {
+          "name": "voice_prompt",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 45
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            46
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-KugelAudio",
+        "ver": "7c73e7a159c7832bf35dae402dee50cb00323bf9",
+        "Node name for S&R": "KugelAudioVoiceCloneNode"
+      },
+      "widgets_values": [
+        "Hello! I am speaking with a cloned voice.",
+        "kugelaudio-0-open",
+        "auto",
+        false,
+        3,
+        2048,
+        "auto",
+        true,
+        false,
+        "auto",
+        2230875177,
+        "randomize",
+        250,
+        true,
+        1,
+        false
+      ]
+    },
+    {
+      "id": 35,
+      "type": "KugelAudioMultiSpeakerNode",
+      "pos": [
+        2157.1953412079847,
+        166.29575365322071
+      ],
+      "size": [
+        428.9998779296875,
+        635.0000366210937
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
           "name": "speaker1_voice",
           "shape": 7,
           "type": "AUDIO",
-          "link": 41
+          "link": 47
         },
         {
           "name": "speaker2_voice",
           "shape": 7,
           "type": "AUDIO",
-          "link": 42
+          "link": 48
         },
         {
           "name": "speaker3_voice",
@@ -331,13 +516,13 @@
           "name": "audio",
           "type": "AUDIO",
           "links": [
-            43
+            49
           ]
         }
       ],
       "properties": {
         "cnr_id": "ComfyUI-KugelAudio",
-        "ver": "86b8fec5adedf55a2506eb19fed66fa68b01d9ce",
+        "ver": "7c73e7a159c7832bf35dae402dee50cb00323bf9",
         "Node name for S&R": "KugelAudioMultiSpeakerNode"
       },
       "widgets_values": [
@@ -351,195 +536,13 @@
         true,
         false,
         "auto",
-        42,
-        "fixed",
-        false,
+        1946033901,
+        "randomize",
+        true,
         1,
-        0.3
+        0.8,
+        false
       ]
-    },
-    {
-      "id": 31,
-      "type": "KugelAudioVoiceCloneNode",
-      "pos": [
-        1370.8347059433875,
-        368.0300594766384
-      ],
-      "size": [
-        426.9099997972994,
-        461.91864354372206
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "voice_prompt",
-          "shape": 7,
-          "type": "AUDIO",
-          "link": 39
-        }
-      ],
-      "outputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "links": [
-            40
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI-KugelAudio",
-        "ver": "86b8fec5adedf55a2506eb19fed66fa68b01d9ce",
-        "Node name for S&R": "KugelAudioVoiceCloneNode"
-      },
-      "widgets_values": [
-        "Hello! I am speaking with a cloned voice.",
-        "kugelaudio-0-open",
-        "auto",
-        false,
-        3,
-        2048,
-        "auto",
-        true,
-        false,
-        "auto",
-        42,
-        "fixed",
-        250,
-        false,
-        1
-      ]
-    },
-    {
-      "id": 2,
-      "type": "PreviewAudio",
-      "pos": [
-        2651.229682543334,
-        627.7075082596679
-      ],
-      "size": [
-        426.5891716558865,
-        93.84615228842233
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 44
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.11.1",
-        "Node name for S&R": "PreviewAudio"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 33,
-      "type": "KugelAudioTTSNode",
-      "pos": [
-        2645.9436142452632,
-        166.9039252491769
-      ],
-      "size": [
-        432.2355106182745,
-        424
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "links": [
-            44
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI-KugelAudio",
-        "ver": "86b8fec5adedf55a2506eb19fed66fa68b01d9ce",
-        "Node name for S&R": "KugelAudioTTSNode"
-      },
-      "widgets_values": [
-        "Hello! This is KugelAudio text-to-speech.",
-        "kugelaudio-0-open",
-        "auto",
-        false,
-        3,
-        2048,
-        "auto",
-        true,
-        false,
-        "auto",
-        212,
-        "fixed",
-        250,
-        false,
-        1
-      ]
-    },
-    {
-      "id": 16,
-      "type": "PreviewAudio",
-      "pos": [
-        2149.7679077890675,
-        863.0751915675404
-      ],
-      "size": [
-        450.7467610569943,
-        88
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 43
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.11.1",
-        "Node name for S&R": "PreviewAudio"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 30,
-      "type": "MarkdownNote",
-      "pos": [
-        919.6982607386791,
-        127.12547163284302
-      ],
-      "size": [
-        421.86371201698296,
-        847.7536354531678
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "‎",
-      "properties": {},
-      "widgets_values": [
-        "# KugelAudio Model Setup\n\n## Model Information\n\n**Model:** [kugelaudio-0-open on Hugging Face](https://huggingface.co/kugelaudio/kugelaudio-0-open)\n\n**Repository:** [ComfyUI-KugelAudio on GitHub](https://github.com/Saganaki22/ComfyUI-KugelAudio)\n\n## Installation Path\n\nThe model files go in:\n```\nComfyUI/\n└── models/\n    └── kugelaudio/\n        └── kugelaudio-0-open/\n            ├── config.json\n            ├── generation_config.json\n            ├── model-00001-of-00004.safetensors\n            ├── model-00002-of-00004.safetensors\n            ├── model-00003-of-00004.safetensors\n            ├── model-00004-of-00004.safetensors\n            └── model.safetensors.index.json\n```\n\n## System Requirements\n\n**VRAM Requirements:**\n- **4-bit quantization:** 8GB VRAM\n- **Full precision:** 19GB VRAM\n\n## Bug Reports\n\n[Report bugs here](https://github.com/Saganaki22/ComfyUI-KugelAudio/issues)\n\n## Supported Languages\n\nKugelAudio supports 24 major European languages with varying levels of quality based on dataset representation:\n\n| Language | Code | Flag | Language | Code | Flag | Language | Code | Flag |\n|----------|------|------|----------|------|------|----------|------|------|\n| English | en | 🇺🇸 | German | de | 🇩🇪 | French | fr | 🇫🇷 |\n| Spanish | es | 🇪🇸 | Italian | it | 🇮🇹 | Portuguese | pt | 🇵🇹 |\n| Dutch | nl | 🇳🇱 | Polish | pl | 🇵🇱 | Russian | ru | 🇷🇺 |\n| Ukrainian | uk | 🇺🇦 | Czech | cs | 🇨🇿 | Romanian | ro | 🇷🇴 |\n| Hungarian | hu | 🇭🇺 | Swedish | sv | 🇸🇪 | Danish | da | 🇩🇰 |\n| Finnish | fi | 🇫🇮 | Norwegian | no | 🇳🇴 | Greek | el | 🇬🇷 |\n| Bulgarian | bg | 🇧🇬 | Slovak | sk | 🇸🇰 | Croatian | hr | 🇭🇷 |\n| Serbian | sr | 🇷🇸 | Turkish | tr | 🇹🇷 | | | |"
-      ],
-      "color": "#222",
-      "bgcolor": "#000"
     }
   ],
   "links": [
@@ -560,48 +563,48 @@
       "AUDIO"
     ],
     [
-      39,
+      45,
       4,
       0,
-      31,
+      34,
       0,
       "AUDIO"
     ],
     [
-      40,
-      31,
+      46,
+      34,
       0,
       26,
       0,
       "AUDIO"
     ],
     [
-      41,
+      47,
       14,
       0,
-      32,
+      35,
       0,
       "AUDIO"
     ],
     [
-      42,
+      48,
       15,
       0,
-      32,
+      35,
       1,
       "AUDIO"
     ],
     [
-      43,
-      32,
+      49,
+      35,
       0,
       16,
       0,
       "AUDIO"
     ],
     [
-      44,
-      33,
+      51,
+      37,
       0,
       2,
       0,
@@ -666,13 +669,13 @@
   "extra": {
     "workflowRendererVersion": "LG",
     "ds": {
-      "scale": 1.0152559799478247,
+      "scale": 0.9090909090909091,
       "offset": [
-        -574.765098143423,
-        -25.376715434330777
+        -786.7658787243106,
+        204.94799614848714
       ]
     },
-    "frontendVersion": "1.37.11",
+    "frontendVersion": "1.38.13",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,

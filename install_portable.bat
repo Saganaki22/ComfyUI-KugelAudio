@@ -37,12 +37,14 @@ if not exist "%PYTHON_PATH%" (
     exit /b 1
 )
 
-echo Installing kugelaudio-open package...
+echo Installing kugelaudio-open package in EDITABLE mode...
 echo Python: %PYTHON_PATH%
 echo Package: %PACKAGE_DIR%
 echo.
+echo (Using -e flag so code changes take effect after restart)
+echo.
 
-"%PYTHON_PATH%" -m pip install "%PACKAGE_DIR%"
+"%PYTHON_PATH%" -m pip install -e "%PACKAGE_DIR%"
 
 echo.
 if %errorlevel% equ 0 (

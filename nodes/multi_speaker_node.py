@@ -140,6 +140,10 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                     "step": 0.1,
                     "tooltip": "Add pause (in seconds) between each speaker for natural pacing.",
                 }),
+                "disable_watermark": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Disable audio watermarking. Enable this if you experience stuttering/micro-freezes in the generated audio.",
+                }),
             },
         }
     
@@ -171,6 +175,7 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
         do_sample: bool = False,
         temperature: float = 1.0,
         pause_between_speakers: float = 0.2,
+        disable_watermark: bool = False,
     ) -> Tuple[Dict[str, Any]]:
         """Generate multi-speaker audio - processes each line separately with voice cloning."""
         try:
@@ -350,9 +355,12 @@ class KugelAudioMultiSpeakerNode(BaseKugelAudioNode):
                 else:
                     full_audio = audio_segments[0]
             
-            # Apply watermark once to full audio to avoid segment boundary artifacts
-            logger.info("Applying watermark to full audio...")
-            full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
+            # Apply watermark once to full audio to avoid segment boundary artifacts (unless disabled)
+            if not disable_watermark:
+                logger.info("Applying watermark to full audio...")
+                full_audio = model_obj._apply_watermark(full_audio, sample_rate=24000)
+            else:
+                logger.info("Watermarking disabled by user")
             
             # Format for ComfyUI
             audio_dict = self._format_audio_for_comfyui(

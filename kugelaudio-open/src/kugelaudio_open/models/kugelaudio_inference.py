@@ -437,12 +437,6 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
         audio_chunks = [[] for _ in range(batch_size)]
         finished = torch.zeros(batch_size, dtype=torch.bool, device=device)
         correct_cnt = torch.zeros(batch_size, dtype=torch.long, device=device)
-        
-        # Estimate minimum speech tokens needed based on text length
-        # Approx 2.5 speech tokens per text token (based on voice_clone_node.py estimate)
-        # Use 80% of estimated as minimum to prevent premature stopping
-        text_token_count = current_ids.shape[1]
-        min_speech_tokens = max(50, int(text_token_count * 2.0))  # At least 50 tokens or 2x text length
 
         # Get initial embeddings
         inputs_embeds = self.model.get_input_embeddings()(current_ids)
@@ -546,16 +540,12 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
                 finished = finished | eos_mask
 
             # Check for speech_end tokens - mark as finished and clear caches
-            # NOTE: Delay finishing to prevent premature cutoff based on text length
             speech_end_mask = (next_tokens == speech_end_id) & ~finished
             if speech_end_mask.any():
+                finished = finished | speech_end_mask
                 speech_end_indices = speech_end_mask.nonzero(as_tuple=False).squeeze(-1)
-                # Only finish if we've generated minimum required tokens based on text length
-                # This prevents the model from stopping before saying all text
-                if step >= min_speech_tokens:
-                    finished = finished | speech_end_mask
-                    acoustic_cache.set_to_zero(speech_end_indices)
-                    semantic_cache.set_to_zero(speech_end_indices)
+                acoustic_cache.set_to_zero(speech_end_indices)
+                semantic_cache.set_to_zero(speech_end_indices)
 
             # Handle speech_start tokens - refresh negative model KV cache
             speech_start_mask = (next_tokens == speech_start_id) & ~finished
@@ -707,32 +697,6 @@ class KugelAudioForConditionalGenerationInference(KugelAudioPreTrainedModel, Gen
                 dim=-1,
             )
             negative_ids = torch.cat([negative_ids, next_tokens.unsqueeze(-1)], dim=-1)
-
-        # Flush remaining cached audio frames by decoding silence tokens
-        # This ensures any trailing audio in the convolution cache is properly output
-        unfinished_indices = (~finished).nonzero(as_tuple=False).squeeze(-1)
-        if unfinished_indices.numel() > 0:
-            # Create zero/silence latents to flush the decoder cache
-            silence_latents = torch.zeros(
-                unfinished_indices.shape[0],
-                1,
-                self.config.decoder_config.vae_dim,
-                device=device,
-                dtype=dtype
-            )
-            
-            # Decode silence to flush remaining cached frames
-            silence_audio = self.acoustic_tokenizer.decode(
-                silence_latents.permute(0, 2, 1),
-                cache=acoustic_cache,
-                sample_indices=unfinished_indices,
-                use_cache=True,
-            )
-            
-            # Append flushed audio to chunks
-            for i, idx in enumerate(unfinished_indices.tolist()):
-                if not finished[idx] and idx < len(audio_chunks):
-                    audio_chunks[idx].append(silence_audio[i].cpu())
 
         # Concatenate audio chunks with normalization
         speech_outputs = []

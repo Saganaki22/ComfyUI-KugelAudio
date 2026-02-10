@@ -70,13 +70,69 @@ The auto-installer detects your Python environment automatically and installs to
 If you see errors on startup about missing `kugelaudio-open` package, install manually:
 
 **Windows Portable (recommended):**
+
+For **first-time installation**, use:
 ```bash
 cd ComfyUI/custom_nodes/ComfyUI-KugelAudio
-..\..\..\python_embeded\python.exe -m pip install ./kugelaudio-open
+..\..\..\python_embeded\python.exe -m pip install -e ./kugelaudio-open
 ```
-Or double-click `install_portable.bat` in the ComfyUI-KugelAudio folder.
+
+For **reinstalling after code changes** (safer - won't break dependencies):
+```bash
+cd ComfyUI/custom_nodes/ComfyUI-KugelAudio
+..\..\..\python_embeded\python.exe -m pip install --no-deps --force-reinstall -e ./kugelaudio-open
+```
+
+Or use the provided batch files in the ComfyUI-KugelAudio folder.
+
+#### Installation Scripts Explained
+
+Two batch files are provided for Windows Portable:
+
+| Script | When to Use | What It Does | Command Used |
+|--------|-------------|--------------|--------------|
+| **`install_portable.bat`** | **First-time installation** | Installs kugelaudio-open in **editable mode** (`-e` flag). Creates a link so code changes take effect after restarting ComfyUI. | `pip install -e ./kugelaudio-open` |
+| **`reinstall_no-deps.bat`** | **After modifying code** (Recommended!) | Safely reinstalls kugelaudio-open **without touching dependencies** (`--no-deps --force-reinstall -e`). Use this when you've edited code or applied fixes and want changes to take effect without risking breaking your environment. | `pip install --no-deps --force-reinstall -e ./kugelaudio-open` |
+
+**Why editable mode (`-e` flag) is CRITICAL:**
+- **Without `-e`**: Code is **copied** to Python's site-packages. Editing `kugelaudio-open/` files won't do anything until you reinstall!
+- **With `-e`**: Python creates a **link** to your `kugelaudio-open/` folder. Code changes take effect immediately after restarting ComfyUI.
+- This is essential for development, bug fixes, and applying updates!
+
+**Why `--no-deps` is important for reinstalls:**
+- Without it: pip might try to reinstall dependencies (torch, transformers, etc.) which could break your ComfyUI environment
+- With it: Only the kugelaudio-open package is reinstalled, keeping all your existing dependencies safe
+
+**When should I reinstall?**
+- After editing any files in `kugelaudio-open/` folder
+- After pulling git updates that modify kugelaudio-open
+- When fixes don't seem to be taking effect
+- If you're told to "reinstall in editable mode"
 
 > **Having issues?** See [Troubleshooting](#troubleshooting) for more solutions.
+
+#### Manual CLI Commands Reference
+
+**Windows Portable (python_embeded):**
+```bash
+# Navigate to node folder
+cd ComfyUI/custom_nodes/ComfyUI-KugelAudio
+
+# First install (editable mode)
+..\..\..\python_embeded\python.exe -m pip install -e ./kugelaudio-open
+
+# Safe reinstall after edits (editable + no deps)
+..\..\..\python_embeded\python.exe -m pip install --no-deps --force-reinstall -e ./kugelaudio-open
+```
+
+**Standard Python (Windows/Linux/macOS):**
+```bash
+# First install (editable mode)
+pip install -e ./kugelaudio-open
+
+# Safe reinstall after edits (editable + no deps)
+pip install --no-deps --force-reinstall -e ./kugelaudio-open
+```
 
 ## Requirements
 
